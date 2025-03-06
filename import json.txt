@@ -1,0 +1,41 @@
+import json  
+from datetime import datetime  
+
+def save_capsule(message, reveal_datetime):  
+    with open("time_capsule.json", "w") as f:  
+        json.dump({"message": message, "reveal_datetime": reveal_datetime.isoformat()}, f)  
+
+def load_capsule():  
+    try:  
+        with open("time_capsule.json", "r") as f:  
+            return json.load(f)  
+    except FileNotFoundError:  
+        return None  
+
+def main():  
+    capsule = load_capsule()  
+    
+    if capsule:  # Check if there's an existing capsule
+        reveal_datetime = datetime.fromisoformat(capsule['reveal_datetime'])  
+        
+        if datetime.now() >= reveal_datetime:  
+            print("Your Time Capsule Message:")  
+            print(capsule['message'])  
+        else:  
+            print(f"The message will be revealed on {reveal_datetime}.")  
+    else:  # No existing capsule, create a new one
+        message = input("Enter your message for the time capsule: ")  
+        reveal_date_str = input("Enter the reveal date (YYYY-MM-DD): ")  
+        reveal_time_str = input("Enter the reveal time (HH:MM, 24-hour format): ")  
+        
+        reveal_datetime_str = f"{reveal_date_str} {reveal_time_str}"  
+        reveal_datetime = datetime.strptime(reveal_datetime_str,"%Y-%m-%d %H:%M") 
+
+        if reveal_datetime <= datetime.now():  
+            print("Please select a future date and time.")  
+        else:  
+            save_capsule(message, reveal_datetime)  
+            print("Your time capsule has been sealed!")  
+
+if _name_ == "_main_":  
+    main()
